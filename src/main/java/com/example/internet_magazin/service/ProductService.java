@@ -3,13 +3,17 @@ package com.example.internet_magazin.service;
 import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.dto.product.ProductFilterDto;
 import com.example.internet_magazin.entity.Product;
+import com.example.internet_magazin.entity.Profile;
 import com.example.internet_magazin.exception.BadRequest;
 import com.example.internet_magazin.repository.ProductRepository;
 import com.example.internet_magazin.type.ProductStatus;
+import com.example.internet_magazin.type.Role;
+import com.example.internet_magazin.util.SecurityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
 
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
@@ -22,9 +26,11 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProfileService profileService;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProfileService profileService) {
         this.productRepository = productRepository;
+        this.profileService = profileService;
     }
 
     public Product getEntity(Integer id) {
@@ -94,7 +100,7 @@ public class ProductService {
         Page<Product> products = productRepository.page(pageRequest);
         List<ProductDto> productList = new ArrayList<>();
         for (Product product : products) {
-            if (product.getDeletedAt() == null) {
+            if (product.getStatus().equals(ProductStatus.PUBLISHED)) {
                 productList.add(convertToDto(product, new ProductDto()));
             }
         }
@@ -104,6 +110,7 @@ public class ProductService {
     public Long getProductCount() {
         return productRepository.productCount();
     }
+
 
     public ProductDto convertToDto(Product product, ProductDto dto) {
         dto.setRate(product.getRate());
@@ -141,5 +148,23 @@ public class ProductService {
         product.setStatus(ProductStatus.BLOCKED);
         productRepository.delete(product);
         return "Product deleted !";
+    }
+
+    public Object visible(Integer id) {
+        if (!profileService.isAdmin()) {
+            throw new BadRequest("Not found :(");
+        }
+        Product product = getEntity(id);
+        product.setStatus(ProductStatus.PUBLISHED);
+        product.setVisible(true);
+        productRepository.save(product);
+        return product;
+    }
+
+    public Object getAllAdmin() {
+        if (profileService.isAdmin()) {
+            return productRepository.findAll();
+        }
+        throw new BadRequest("Not found");
     }
 }

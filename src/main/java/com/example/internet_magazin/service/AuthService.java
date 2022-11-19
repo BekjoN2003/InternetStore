@@ -1,6 +1,5 @@
 package com.example.internet_magazin.service;
 
-import com.example.internet_magazin.config.JwtTokenFilter;
 import com.example.internet_magazin.dto.auth.LoginDto;
 import com.example.internet_magazin.dto.auth.LoginResultDto;
 import com.example.internet_magazin.dto.auth.SignInDto;

@@ -9,6 +9,7 @@ import com.example.internet_magazin.type.ProfileStatus;
 import com.example.internet_magazin.type.Role;
 
 import com.example.internet_magazin.util.JwtTokenUtil;
+import com.example.internet_magazin.util.SecurityUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -120,6 +121,17 @@ public class ProfileService {
         } );
         Page<Profile> page = profileRepository.findAll(specification, pageable);
         return page.stream().map(profile -> convertToDto(profile, new ProfileDto())).collect(Collectors.toList());
+    }
+
+    public Boolean isAdmin(){
+        Profile profile = getEntity(SecurityUtil.getProfileId());
+        if (profile == null){
+            throw new BadRequest("Profile not found");
+        }
+        else if (profile.getRole().equals(Role.ADMIN)) {
+            return true;
+        }
+        return false;
     }
 
 

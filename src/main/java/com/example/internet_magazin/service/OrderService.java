@@ -3,10 +3,11 @@ package com.example.internet_magazin.service;
 import com.example.internet_magazin.dto.order.OrderCreateDto;
 import com.example.internet_magazin.dto.order.OrderDto;
 import com.example.internet_magazin.entity.Order;
+import com.example.internet_magazin.entity.Product;
 import com.example.internet_magazin.exception.BadRequest;
 import com.example.internet_magazin.repository.OrderRepository;
+import com.example.internet_magazin.repository.ProductRepository;
 import com.example.internet_magazin.type.OrderStatus;
-import com.example.internet_magazin.type.PaymentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,11 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public OrderService(OrderRepository orderRepository) {
+    private final ProductRepository productRepository;
+
+    public OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
+        this.productRepository = productRepository;
     }
 
     public Order getEntity(Integer id) {
@@ -35,6 +39,10 @@ public class OrderService {
     }
 
     public OrderDto create(OrderCreateDto dto) {
+        Optional<Product> optional = productRepository.findById(dto.getProfileId());
+        if (optional.isEmpty()){
+            throw new BadRequest("Product not found");
+        }
         Order order = new Order();
         order.setAddress(dto.getAddress());
         order.setStatus(OrderStatus.CREATED);

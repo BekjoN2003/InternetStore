@@ -1,6 +1,5 @@
 package com.example.internet_magazin.service;
 
-import com.example.internet_magazin.config.JwtTokenFilter;
 
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;

@@ -30,8 +30,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         System.out.println("Filterga keldi!");
 
         // Get authorization header and validate
@@ -54,13 +54,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                                             userDetails, null, userDetails.getAuthorities());
-
-/*        public Date getExpirationDate(String token) {
-            Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-            return claims.getExpiration();
-        }*/
-
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);

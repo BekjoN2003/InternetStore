@@ -2,6 +2,7 @@ package com.example.internet_magazin.controller;
 
 import com.example.internet_magazin.dto.image.ImageDto;
 import com.example.internet_magazin.dto.order.OrderDto;
+import com.example.internet_magazin.dto.orderItm.OrderItemDto;
 import com.example.internet_magazin.service.OrderItemService;
 
 import org.springframework.http.ResponseEntity;
@@ -21,23 +22,9 @@ public class OrderItemController {
 
     @PostMapping("/")
     public ResponseEntity<?> createOrder(@RequestBody @Valid OrderDto dto){
-        OrderDto result = orderItemService.create(dto);
+        OrderItemDto result = orderItemService.create(dto);
         return ResponseEntity.ok(result);
     }
-    @GetMapping("/")
-    public ResponseEntity<?> getOrder(@RequestBody @Valid ImageDto dto){
-        OrderDto result = orderItemService.get(dto);
-        return ResponseEntity.ok(result);
-    }
-    @PutMapping("/")
-    public ResponseEntity<?> updateOrder(@RequestBody @Valid ImageDto dto){
-        OrderDto result = orderItemService.update(dto);
-        return ResponseEntity.ok(result);
-    }
-    @DeleteMapping("/")
-    public ResponseEntity<?> deleteOrder(@RequestBody @Valid ImageDto dto){
-        boolean result = orderItemService.delete(dto);
-        return ResponseEntity.ok(result);
-    }
+
 
 }

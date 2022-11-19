@@ -39,6 +39,11 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
+    @PutMapping("/visible/{id}")
+    public ResponseEntity<?> visibleProduct(@PathVariable("id")Integer id){
+        return ResponseEntity.ok(productService.visible(id));
+    }
+
     @GetMapping("/getAll")
     public ResponseEntity<?> getAll(@RequestParam("page") Integer page,
                                     @RequestParam("size") Integer size) {
@@ -70,6 +75,12 @@ public class ProductController {
     @DeleteMapping("/deleteEntity/{id}")
     public ResponseEntity<?> hardDelete(@PathVariable("id") Integer id){
         String result = productService.hardDelete(id);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/secured/getAll")
+    public ResponseEntity<?>getById(){
+        Object result = productService.getAllAdmin();
         return ResponseEntity.ok(result);
     }
 
