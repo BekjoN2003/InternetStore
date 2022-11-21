@@ -7,10 +7,7 @@ import lombok.Setter;
 @Setter
 public class OrderItemCreateDto {
 
-
     private Integer orderId;
-
-    private Integer productId;
     private Integer amount;
     private Double price;
 }

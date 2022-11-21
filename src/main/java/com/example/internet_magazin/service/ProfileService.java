@@ -1,5 +1,6 @@
 package com.example.internet_magazin.service;
 
+import com.example.internet_magazin.dto.profile.ProfileCreateDto;
 import com.example.internet_magazin.dto.profile.ProfileDto;
 import com.example.internet_magazin.dto.profile.ProfileFilterDto;
 import com.example.internet_magazin.entity.Profile;
@@ -37,7 +38,7 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
-    public ProfileDto create(ProfileDto dto) {
+    public ProfileDto create(ProfileCreateDto dto) {
         Profile profile = new Profile();
         profile.setSurname(dto.getSurname());
         profile.setStatus(ProfileStatus.INACTIVE);

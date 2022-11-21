@@ -1,25 +1,72 @@
 package com.example.internet_magazin.service;
 
-import com.example.internet_magazin.dto.image.ImageDto;
-import com.example.internet_magazin.dto.order.OrderDto;
+import com.example.internet_magazin.dto.orderItm.OrderItemCreateDto;
 import com.example.internet_magazin.dto.orderItm.OrderItemDto;
+import com.example.internet_magazin.entity.OrderItem;
+import com.example.internet_magazin.exception.BadRequest;
+import com.example.internet_magazin.repository.OrderItemRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class OrderItemService {
-    public OrderItemDto create(OrderDto dto) {
 
-        return null;
+    private final OrderItemRepository orderItemRepository;
+
+    public OrderItemService(OrderItemRepository orderItemRepository) {
+        this.orderItemRepository = orderItemRepository;
     }
 
-    public OrderDto get(ImageDto dto) {
-        return null;
+    public OrderItem getEntity(Integer id) {
+        Optional<OrderItem> optional = orderItemRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new BadRequest("Order Item not found !!");
+        }
+        return optional.get();
     }
 
-    public OrderDto update(ImageDto dto) {
-        return null;
+    public OrderItemDto create(OrderItemCreateDto dto) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setCreatedAt(LocalDateTime.now());
+        orderItem.setPrice(dto.getPrice());
+        orderItem.setAmount(dto.getAmount());
+        orderItem.setOrderId(dto.getOrderId());
+        orderItemRepository.save(orderItem);
+        return convertToDto(orderItem, new OrderItemDto());
     }
 
-    public boolean delete(ImageDto dto) {
-        return false;
+    public OrderItemDto update(Integer id, OrderItemCreateDto dto) {
+        OrderItem orderItem = getEntity(id);
+        orderItem.setUpdatedAt(LocalDateTime.now());
+        orderItem.setPrice(dto.getPrice());
+        orderItem.setAmount(dto.getAmount());
+        orderItemRepository.save(orderItem);
+        return convertToDto(orderItem, new OrderItemDto());
+    }
+
+    public boolean delete(Integer id) {
+        OrderItem orderItem = getEntity(id);
+        orderItem.setDeletedAt(LocalDateTime.now());
+        orderItemRepository.delete(orderItem);
+        return true;
+    }
+
+
+    public List<OrderItemDto> getAll(Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<OrderItem> orderItems = orderItemRepository.findAll(pageRequest);
+        return orderItems.stream().map(orderItem -> convertToDto(orderItem, new OrderItemDto())).collect(Collectors.toList());
+    }
+
+    public OrderItemDto convertToDto(OrderItem item, OrderItemDto dto) {
+        dto.setAmount(item.getAmount());
+        dto.setPrice(item.getPrice());
+        return dto;
     }
 }

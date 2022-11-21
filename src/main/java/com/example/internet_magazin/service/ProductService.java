@@ -1,21 +1,22 @@
 package com.example.internet_magazin.service;
 
+import com.example.internet_magazin.dto.product.ProductCreateDto;
 import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.dto.product.ProductFilterDto;
 import com.example.internet_magazin.entity.Product;
-import com.example.internet_magazin.entity.Profile;
 import com.example.internet_magazin.exception.BadRequest;
 import com.example.internet_magazin.repository.ProductRepository;
 import com.example.internet_magazin.type.ProductStatus;
-import com.example.internet_magazin.type.Role;
-import com.example.internet_magazin.util.SecurityUtil;
+import com.sun.net.httpserver.Authenticator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 
 
 import javax.persistence.criteria.Predicate;
+import java.net.http.HttpRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,20 +35,21 @@ public class ProductService {
     }
 
     public Product getEntity(Integer id) {
+        Product product = new Product();
         Optional<Product> optional = productRepository.findById(id);
+        product.getStatus().equals(ProductStatus.PUBLISHED);
         if (optional.isEmpty()) {
             throw new BadRequest("Product not found!!");
         }
         return optional.get();
     }
 
-    public ProductDto create(ProductDto dto) {
+    public ProductDto create(ProductCreateDto dto) {
         Product product = new Product();
         product.setCreatedAt(LocalDateTime.now());
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
-        product.setId(dto.getId());
         product.setStatus(ProductStatus.CREATED);
         productRepository.save(product);
         return convertToDto(product, new ProductDto());
@@ -121,13 +123,12 @@ public class ProductService {
     }
 
 
-    public ProductDto update(ProductDto dto, Integer id) {
+    public ProductDto update(ProductCreateDto dto, Integer id) {
         Product product = getEntity(id);
         product.setPrice(dto.getPrice());
         product.setUpdatedAt(LocalDateTime.now());
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
-        product.setId(dto.getId());
         productRepository.save(product);
         return convertToDto(product, new ProductDto());
     }
@@ -136,7 +137,6 @@ public class ProductService {
     public boolean softDelete(Integer id) {
         Product product = getEntity(id);
         product.setDeletedAt(LocalDateTime.now());
-        product.setStatus(ProductStatus.BLOCKED);
         productRepository.save(product);
         return true;
     }
@@ -145,14 +145,20 @@ public class ProductService {
     public String hardDelete(Integer id) {
         Product product = getEntity(id);
         product.setDeletedAt(LocalDateTime.now());
-        product.setStatus(ProductStatus.BLOCKED);
         productRepository.delete(product);
         return "Product deleted !";
     }
 
+    public Object getAllAdmin() {
+        if (profileService.isAdmin()) {
+            return productRepository.findAll();
+        }
+        throw new BadRequest("Not found");
+    }
+
     public Object visible(Integer id) {
         if (!profileService.isAdmin()) {
-            throw new BadRequest("Not found :(");
+            throw new BadRequest("Only Admin can do visible");
         }
         Product product = getEntity(id);
         product.setStatus(ProductStatus.PUBLISHED);
@@ -161,10 +167,14 @@ public class ProductService {
         return product;
     }
 
-    public Object getAllAdmin() {
-        if (profileService.isAdmin()) {
-            return productRepository.findAll();
+    public Object block(Integer id) {
+        if (!profileService.isAdmin()){
+            throw new BadRequest("You are not Admin !!");
         }
-        throw new BadRequest("Not found");
+        Product product = getEntity(id);
+        product.setStatus(ProductStatus.BLOCKED);
+        product.setVisible(false);
+        productRepository.save(product);
+        return product;
     }
 }

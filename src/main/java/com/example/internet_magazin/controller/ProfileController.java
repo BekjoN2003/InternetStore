@@ -1,5 +1,6 @@
 package com.example.internet_magazin.controller;
 
+import com.example.internet_magazin.dto.profile.ProfileCreateDto;
 import com.example.internet_magazin.dto.profile.ProfileDto;
 import com.example.internet_magazin.dto.profile.ProfileFilterDto;
 import com.example.internet_magazin.service.ProfileService;
@@ -21,7 +22,7 @@ public class ProfileController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createProfile(@RequestBody @Valid ProfileDto dto){
+    public ResponseEntity<?> createProfile(@RequestBody @Valid ProfileCreateDto dto){
         ProfileDto result = profileService.create(dto);
         return ResponseEntity.ok(result);
     }

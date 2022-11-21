@@ -1,5 +1,6 @@
 package com.example.internet_magazin.controller;
 
+import com.example.internet_magazin.dto.product.ProductCreateDto;
 import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.dto.product.ProductFilterDto;
 import com.example.internet_magazin.dto.product.ProductListRepository;
@@ -21,7 +22,7 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductDto dto) {
+    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductCreateDto dto) {
         ProductDto result = productService.create(dto);
         return ResponseEntity.ok(result);
     }
@@ -43,6 +44,11 @@ public class ProductController {
     public ResponseEntity<?> visibleProduct(@PathVariable("id")Integer id){
         return ResponseEntity.ok(productService.visible(id));
     }
+    @PutMapping("/secured/block/{id}")
+    public ResponseEntity<?> hiddenProduct(@PathVariable("id") Integer id){
+        Object result = productService.block(id);
+        return ResponseEntity.ok(result);
+    }
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAll(@RequestParam("page") Integer page,
@@ -61,7 +67,7 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable("id") Integer id, @Valid ProductDto dto) {
+    public ResponseEntity<?> updateProduct(@PathVariable("id") Integer id, @Valid ProductCreateDto dto) {
         ProductDto result = productService.update(dto, id);
         return ResponseEntity.ok(result);
     }
