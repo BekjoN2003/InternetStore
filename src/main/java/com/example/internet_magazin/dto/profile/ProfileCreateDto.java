@@ -18,7 +18,7 @@ public class ProfileCreateDto {
     @NotBlank(message = "Email can not be empty or null")
     @Email
     private String email;
-    @NotNull(message = "Please enter contact !")
+    @NotBlank(message = "Please enter contact !")
     @NumberFormat
     private String contact;
 

@@ -46,10 +46,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("api/v1/profile/**").hasAnyRole("ADMIN", "USER", "MODERATOR")
                 .antMatchers("api/v1/profile/secured/**").hasRole("ADMIN")
-                .antMatchers("api/v1/product/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers("api/v1/product/image/**").hasRole("USER")
-                .antMatchers("api/v1/order/item/**").hasAnyRole("USER", "ADMIN")
-                .antMatchers("api/v1/order/**").hasRole("USER")
+                .antMatchers("api/v1/product/**").hasAnyRole("MODERATOR", "ADMIN")
+                .antMatchers("api/v1/product/image/**").hasRole("MODERATOR")
+                .antMatchers("api/v1/order/item/**").hasAnyRole("MODERATOR", "ADMIN")
+                .antMatchers("api/v1/order/**").hasRole("MODERATOR")
                 .anyRequest().permitAll();
 
         //changed not authorized request

@@ -3,6 +3,7 @@ package com.example.internet_magazin.entity;
 import com.example.internet_magazin.type.ProductStatus;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class Product {
     private String description;
     private Double price;
     private Boolean visible;
+    @Enumerated(EnumType.STRING)
     private ProductStatus status;
     @Column(name = ("deleted_at"))
     private LocalDateTime deletedAt;

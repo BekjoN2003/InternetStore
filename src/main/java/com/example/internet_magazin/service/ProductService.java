@@ -7,16 +7,12 @@ import com.example.internet_magazin.entity.Product;
 import com.example.internet_magazin.exception.BadRequest;
 import com.example.internet_magazin.repository.ProductRepository;
 import com.example.internet_magazin.type.ProductStatus;
-import com.sun.net.httpserver.Authenticator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
-
 
 import javax.persistence.criteria.Predicate;
-import java.net.http.HttpRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +33,8 @@ public class ProductService {
     public Product getEntity(Integer id) {
         Product product = new Product();
         Optional<Product> optional = productRepository.findById(id);
-        product.getStatus().equals(ProductStatus.PUBLISHED);
+        //product.setStatus(ProductStatus.PUBLISHED);
+        product.getStatus().valueOf(String.valueOf(ProductStatus.PUBLISHED));
         if (optional.isEmpty()) {
             throw new BadRequest("Product not found!!");
         }
@@ -149,25 +146,25 @@ public class ProductService {
         return "Product deleted !";
     }
 
-    public Object getAllAdmin() {
+    public String getAllAdmin() {
         if (profileService.isAdmin()) {
-            return productRepository.findAll();
+            return "Admin";
         }
         throw new BadRequest("Not found");
     }
 
-    public Object visible(Integer id) {
+    public Product visible(Integer id , Product product) {
         if (!profileService.isAdmin()) {
             throw new BadRequest("Only Admin can do visible");
         }
-        Product product = getEntity(id);
+        getEntity(id);
         product.setStatus(ProductStatus.PUBLISHED);
         product.setVisible(true);
         productRepository.save(product);
         return product;
     }
 
-    public Object block(Integer id) {
+    public String block(Integer id) {
         if (!profileService.isAdmin()){
             throw new BadRequest("You are not Admin !!");
         }
@@ -175,6 +172,6 @@ public class ProductService {
         product.setStatus(ProductStatus.BLOCKED);
         product.setVisible(false);
         productRepository.save(product);
-        return product;
+        return "BLOCKED !";
     }
 }

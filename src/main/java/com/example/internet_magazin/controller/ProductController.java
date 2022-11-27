@@ -4,6 +4,7 @@ import com.example.internet_magazin.dto.product.ProductCreateDto;
 import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.dto.product.ProductFilterDto;
 import com.example.internet_magazin.dto.product.ProductListRepository;
+import com.example.internet_magazin.entity.Product;
 import com.example.internet_magazin.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,12 +42,12 @@ public class ProductController {
     }
 
     @PutMapping("/visible/{id}")
-    public ResponseEntity<?> visibleProduct(@PathVariable("id")Integer id){
-        return ResponseEntity.ok(productService.visible(id));
+    public ResponseEntity<?> visibleProduct(@PathVariable("id")Integer id, Product product){
+        return ResponseEntity.ok(productService.visible(id, product));
     }
     @PutMapping("/secured/block/{id}")
     public ResponseEntity<?> hiddenProduct(@PathVariable("id") Integer id){
-        Object result = productService.block(id);
+        String result = productService.block(id);
         return ResponseEntity.ok(result);
     }
 
@@ -74,7 +75,7 @@ public class ProductController {
             //------------SOFT DELETE-----------//
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable("id")Integer id){
-        boolean result = productService.softDelete(id);
+        boolean result = productService.    softDelete(id);
         return ResponseEntity.ok(result);
     }
             // -------------HARD DELETE----------//
@@ -86,7 +87,7 @@ public class ProductController {
 
     @GetMapping("/secured/getAll")
     public ResponseEntity<?>getById(){
-        Object result = productService.getAllAdmin();
+        String result = productService.getAllAdmin();
         return ResponseEntity.ok(result);
     }
 

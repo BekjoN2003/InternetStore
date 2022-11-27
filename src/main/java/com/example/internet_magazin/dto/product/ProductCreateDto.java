@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -17,7 +18,7 @@ public class ProductCreateDto {
 
     private String description;
 
-    @NotBlank(message = "Please enter Price")
+    @NotNull(message = "Please enter Price")
     private Double price;
     private Boolean visible;
 }

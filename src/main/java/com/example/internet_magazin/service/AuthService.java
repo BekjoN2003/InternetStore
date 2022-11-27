@@ -86,7 +86,7 @@ public class AuthService {
     public String verification(String token) {
         Profile profile = profileRepository.getById(jwtTokenUtil.getUserID(token));
         if (profile == null) {
-            return "Profile not found";
+            return "Profile not found"; 
         }
         if (profile.getStatus().equals(ProfileStatus.BLOCKED)) {
             return "Your profile is blocked";
