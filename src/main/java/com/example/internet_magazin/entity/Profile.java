@@ -23,7 +23,9 @@ public class Profile {
     private String email;
     private String contact;
     private String password;
+    @Enumerated(EnumType.STRING)
     private ProfileStatus status;
+    @Enumerated(EnumType.STRING)
     private Role role;
     @Column(name = ("deleted_at"))
     private LocalDateTime deletedAt;

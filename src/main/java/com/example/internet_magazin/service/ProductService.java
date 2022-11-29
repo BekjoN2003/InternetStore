@@ -7,6 +7,7 @@ import com.example.internet_magazin.entity.Product;
 import com.example.internet_magazin.exception.BadRequest;
 import com.example.internet_magazin.repository.ProductRepository;
 import com.example.internet_magazin.type.ProductStatus;
+import com.example.internet_magazin.type.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -48,13 +49,14 @@ public class ProductService {
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
         product.setStatus(ProductStatus.CREATED);
+        product.setVisible(dto.getVisible());
         productRepository.save(product);
         return convertToDto(product, new ProductDto());
     }
 
     public ProductDto get(Integer id) {
         Product product = getEntity(id);
-        if (!product.getVisible()) {
+        if (product == null) {
             throw new BadRequest("Product has been deleted");
         }
         return convertToDto(product, new ProductDto());
@@ -63,8 +65,7 @@ public class ProductService {
     public List<ProductDto> filter(ProductFilterDto dto) {
         String sortBy = ("created_at");
         if (dto.getSortBy() != null) {
-            sortBy = dto.getSortBy();
-        }
+            sortBy = dto.getSortBy();}
         PageRequest pageRequest = PageRequest.of(dto.getPage(), dto.getSize(), dto.getDirection(), sortBy);
         List<Predicate> predicates = new ArrayList<>();
         Specification<Product> specification = ((root, query, criteriaBuilder) -> {
@@ -73,6 +74,9 @@ public class ProductService {
             }
             if (dto.getDescription() != null) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + dto.getDescription() + "%"));
+            }
+            if (dto.getPrice() != null){
+                predicates.add(criteriaBuilder.like(root.get("price"),"%" + dto.getPrice() + "%" ));
             }
             if (dto.getMinCreatedDate() != null && dto.getMaxCreatedDate() != null) {
                 predicates.add(criteriaBuilder.between(root.get("createdAt"),
@@ -87,16 +91,14 @@ public class ProductService {
                         dto.getMaxCreatedDate()));
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-
         });
         Page<Product> page = productRepository.findAll(specification, pageRequest);
-
         return page.stream().map(product -> convertToDto(product, new ProductDto())).collect(Collectors.toList());
     }
 
     public List<ProductDto> getAll(Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Product> products = productRepository.page(pageRequest);
+        Page<Product> products = productRepository.findAll(pageRequest);
         List<ProductDto> productList = new ArrayList<>();
         for (Product product : products) {
             if (product.getStatus().equals(ProductStatus.PUBLISHED)) {
@@ -120,14 +122,15 @@ public class ProductService {
     }
 
 
-    public ProductDto update(ProductCreateDto dto, Integer id) {
+    public String update(Integer id, ProductDto dto) {
         Product product = getEntity(id);
-        product.setPrice(dto.getPrice());
         product.setUpdatedAt(LocalDateTime.now());
+        product.setPrice(dto.getPrice());
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         productRepository.save(product);
-        return convertToDto(product, new ProductDto());
+        convertToDto(product, new ProductDto());
+        return "Product updated !";
     }
 
 
@@ -153,7 +156,7 @@ public class ProductService {
         throw new BadRequest("Not found");
     }
 
-    public Product visible(Integer id , Product product) {
+    public Product visible(Integer id, Product product) {
         if (!profileService.isAdmin()) {
             throw new BadRequest("Only Admin can do visible");
         }
@@ -164,14 +167,14 @@ public class ProductService {
         return product;
     }
 
-    public String block(Integer id) {
-        if (!profileService.isAdmin()){
+    public boolean block(Integer id) {
+        if (!profileService.isAdmin()) {
             throw new BadRequest("You are not Admin !!");
         }
         Product product = getEntity(id);
         product.setStatus(ProductStatus.BLOCKED);
         product.setVisible(false);
         productRepository.save(product);
-        return "BLOCKED !";
+        return true;
     }
 }

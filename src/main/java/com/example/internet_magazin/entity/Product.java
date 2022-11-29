@@ -1,6 +1,8 @@
 package com.example.internet_magazin.entity;
 
 import com.example.internet_magazin.type.ProductStatus;
+import com.example.internet_magazin.type.ProductType;
+import com.example.internet_magazin.type.Role;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

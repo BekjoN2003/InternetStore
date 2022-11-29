@@ -47,7 +47,10 @@ public class JwtTokenUtil {
 
     public Integer getUserID(String token) {
         try {
-            Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+            Claims claims = Jwts.parser().
+                    setSigningKey(jwtSecret).
+                    parseClaimsJws(token).
+                    getBody();
             return Integer.valueOf(claims.getSubject().split(",")[0]);
         } catch (RuntimeException e) {
             throw new BadRequest("token expired");

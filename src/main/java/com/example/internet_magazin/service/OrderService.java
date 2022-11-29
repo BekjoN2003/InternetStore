@@ -48,6 +48,7 @@ public class OrderService {
         order.setStatus(OrderStatus.CREATED);
         order.setCreatedAt(LocalDateTime.now());
         order.setContact(dto.getContact());
+        orderRepository.save(order);
         return convertToDto(order, new OrderDto());
 
     }
@@ -105,8 +106,17 @@ public class OrderService {
     }
 
     public OrderDto deliveredAt(Integer id) {
+        Order order = getEntity(id);
+        if (order.getStatus().equals(OrderStatus.DELIVERED)){
+            throw new BadRequest("This order is delivered! ID: "+id);
+        } else if (order.getStatus().equals((OrderStatus.CREATED))) {
+            throw new BadRequest("This order has not yet been paid! ID: "+id);
+        }
+        order.setDeliveryAt(LocalDateTime.now());
+        order.setStatus(OrderStatus.DELIVERED);
+        orderRepository.save(order);
+        return convertToDto(order,new OrderDto());
 
-        return null;
     }
 
 

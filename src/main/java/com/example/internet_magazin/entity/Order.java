@@ -22,7 +22,9 @@ public class Order {
     private String requirement;
     private String contact;
     private String address;
+    @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
     @Column(name = ("delivery_date"), insertable = false, updatable = false)
     private LocalDateTime deliveryDate;

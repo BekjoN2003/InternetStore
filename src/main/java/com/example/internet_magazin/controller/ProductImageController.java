@@ -23,10 +23,5 @@ public class ProductImageController {
         return ResponseEntity.ok(result);
     }
 
-
-
-
-
-
 }
 

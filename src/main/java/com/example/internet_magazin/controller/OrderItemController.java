@@ -1,10 +1,8 @@
 package com.example.internet_magazin.controller;
 
-import com.example.internet_magazin.dto.image.ImageDto;
-import com.example.internet_magazin.dto.order.OrderDto;
 import com.example.internet_magazin.dto.orderItm.OrderItemCreateDto;
 import com.example.internet_magazin.dto.orderItm.OrderItemDto;
-import com.example.internet_magazin.entity.OrderItem;
+import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.service.OrderItemService;
 
 import org.springframework.http.ResponseEntity;
@@ -29,12 +27,11 @@ public class OrderItemController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateItem(@PathVariable("id") Integer id, @Valid OrderItemCreateDto dto){
-        OrderItemDto result = orderItemService.update(id, dto);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getItem(@PathVariable("id") Integer id) {
+        OrderItemDto result = orderItemService.get(id);
         return ResponseEntity.ok(result);
     }
-
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAll(@RequestParam("page")Integer page,
@@ -42,6 +39,13 @@ public class OrderItemController {
         List<OrderItemDto> result= orderItemService.getAll(page,size);
         return ResponseEntity.ok(result);
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateItem(@PathVariable("id") Integer id, @Valid OrderItemCreateDto dto){
+        OrderItemDto result = orderItemService.update(id, dto);
+        return ResponseEntity.ok(result);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteItem(@PathVariable("id") Integer id){

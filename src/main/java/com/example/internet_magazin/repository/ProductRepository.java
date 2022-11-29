@@ -9,11 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Integer>, JpaSpecificationExecutor<Product> {
+public interface ProductRepository extends JpaRepository<Product, Integer>,
+        JpaSpecificationExecutor<Product> {
 
 
-    @Query(value = "SELECT * FROM product where deleted_at is null", nativeQuery = true)
-    Page<Product> page(Pageable pageable);
+    @Query(value = "SELECT * FROM products where deleted_at is null and visible is not null", nativeQuery = true)
+    Page<Product> findAll(Pageable pageable);
 
     @Query ("SELECT count(id) FROM products where deletedAt is null")
     Long productCount();

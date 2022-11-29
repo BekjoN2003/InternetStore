@@ -31,6 +31,10 @@ public class OrderItemService {
         return optional.get();
     }
 
+    public OrderItemDto get (Integer id){
+        return convertToDto(getEntity(id),new OrderItemDto());
+    }
+
     public OrderItemDto create(OrderItemCreateDto dto) {
         OrderItem orderItem = new OrderItem();
         orderItem.setCreatedAt(LocalDateTime.now());

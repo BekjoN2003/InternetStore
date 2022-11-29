@@ -9,6 +9,7 @@ import com.example.internet_magazin.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import javax.validation.Valid;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/secured/create")
     public ResponseEntity<?> createProduct(@RequestBody @Valid ProductCreateDto dto) {
         ProductDto result = productService.create(dto);
         return ResponseEntity.ok(result);
@@ -36,7 +37,7 @@ public class ProductController {
 
 
     @GetMapping("/filter")
-    public ResponseEntity<?> getFilter(@RequestBody @Valid ProductFilterDto dto) {
+    public ResponseEntity<?> getFilter(@RequestBody ProductFilterDto dto) {
         List<ProductDto> result = productService.filter(dto);
         return ResponseEntity.ok(result);
     }
@@ -47,20 +48,13 @@ public class ProductController {
     }
     @PutMapping("/secured/block/{id}")
     public ResponseEntity<?> hiddenProduct(@PathVariable("id") Integer id){
-        String result = productService.block(id);
+        boolean result = productService.block(id);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAll(@RequestParam("page") Integer page,
                                     @RequestParam("size") Integer size) {
-        if (page == null) {
-            page = 0;
-        }
-        if (size == null) {
-            size = 15;
-        }
-
         ProductListRepository productListRepository = new ProductListRepository();
         productListRepository.setDtoList(productService.getAll(page, size));
         productListRepository.setCount(productService.getProductCount());
@@ -68,8 +62,9 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable("id") Integer id, @Valid ProductCreateDto dto) {
-        ProductDto result = productService.update(dto, id);
+    public ResponseEntity<?> updateProduct(@PathVariable("id") Integer id,
+                                           @RequestBody ProductDto dto) {
+        String result = productService.update(id, dto);
         return ResponseEntity.ok(result);
     }
             //------------SOFT DELETE-----------//
