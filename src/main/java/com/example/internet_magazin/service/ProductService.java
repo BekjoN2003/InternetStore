@@ -5,11 +5,12 @@ import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.dto.product.ProductFilterDto;
 import com.example.internet_magazin.entity.Product;
 import com.example.internet_magazin.exception.BadRequest;
+import com.example.internet_magazin.repository.ProductImageRepository;
 import com.example.internet_magazin.repository.ProductRepository;
 import com.example.internet_magazin.type.ProductStatus;
-import com.example.internet_magazin.type.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -21,21 +22,31 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProfileService profileService;
 
-    public ProductService(ProductRepository productRepository, ProfileService profileService) {
+    private final ProductImageService productImageService;
+
+    private final ImageService imageService;
+
+    private final ProductImageRepository productImageRepository;
+
+    public ProductService(ProductRepository productRepository, ProfileService profileService, ProductImageService productImageService, ImageService imageService, ProductImageRepository productImageRepository) {
         this.productRepository = productRepository;
         this.profileService = profileService;
+        this.productImageService = productImageService;
+        this.imageService = imageService;
+        this.productImageRepository = productImageRepository;
     }
 
     public Product getEntity(Integer id) {
         Product product = new Product();
         Optional<Product> optional = productRepository.findById(id);
-        //product.setStatus(ProductStatus.PUBLISHED);
-        product.getStatus().valueOf(String.valueOf(ProductStatus.PUBLISHED));
+        product.setStatus(ProductStatus.PUBLISHED);
+        //product.getStatus().valueOf(String.valueOf(ProductStatus.PUBLISHED));
         if (optional.isEmpty()) {
             throw new BadRequest("Product not found!!");
         }
@@ -45,10 +56,11 @@ public class ProductService {
     public ProductDto create(ProductCreateDto dto) {
         Product product = new Product();
         product.setCreatedAt(LocalDateTime.now());
+        product.setVisible(true);
         product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
-        product.setStatus(ProductStatus.CREATED);
+        product.setStatus(ProductStatus.PUBLISHED);
         product.setVisible(dto.getVisible());
         productRepository.save(product);
         return convertToDto(product, new ProductDto());
@@ -59,7 +71,9 @@ public class ProductService {
         if (product == null) {
             throw new BadRequest("Product has been deleted");
         }
-        return convertToDto(product, new ProductDto());
+        ProductDto dto = convertToDto(product, new ProductDto());
+        dto.setImageList(productImageService.getImage(id));
+        return dto;
     }
 
     public List<ProductDto> filter(ProductFilterDto dto) {
@@ -67,41 +81,40 @@ public class ProductService {
         if (dto.getSortBy() != null) {
             sortBy = dto.getSortBy();}
         PageRequest pageRequest = PageRequest.of(dto.getPage(), dto.getSize(), dto.getDirection(), sortBy);
-        List<Predicate> predicates = new ArrayList<>();
+        List<Predicate> predicateList = new ArrayList<>();
         Specification<Product> specification = ((root, query, criteriaBuilder) -> {
             if (dto.getName() != null) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + dto.getName() + "%"));
+                predicateList.add(criteriaBuilder.like(root.get("name"), "%" +
+                        dto.getName() + "%"));
             }
             if (dto.getDescription() != null) {
-                predicates.add(criteriaBuilder.like(root.get("description"), "%" + dto.getDescription() + "%"));
-            }
-            if (dto.getPrice() != null){
-                predicates.add(criteriaBuilder.like(root.get("price"),"%" + dto.getPrice() + "%" ));
+                predicateList.add(criteriaBuilder.equal(root.get("description"),
+                        dto.getDescription()));
             }
             if (dto.getMinCreatedDate() != null && dto.getMaxCreatedDate() != null) {
-                predicates.add(criteriaBuilder.between(root.get("createdAt"),
+                predicateList.add(criteriaBuilder.between(root.get("createdAt"),
                         dto.getMinCreatedDate(), dto.getMaxCreatedDate()));
             }
             if (dto.getMinCreatedDate() == null && dto.getMaxCreatedDate() != null) {
-                predicates.add(criteriaBuilder.lessThan(root.get("createdAt"),
+                predicateList.add(criteriaBuilder.lessThan(root.get("createdAt"),
                         dto.getMinCreatedDate()));
             }
             if (dto.getMinCreatedDate() != null && dto.getMaxCreatedDate() == null) {
-                predicates.add(criteriaBuilder.greaterThan(root.get("createdAt"),
+                predicateList.add(criteriaBuilder.greaterThan(root.get("createdAt"),
                         dto.getMaxCreatedDate()));
             }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
         });
         Page<Product> page = productRepository.findAll(specification, pageRequest);
         return page.stream().map(product -> convertToDto(product, new ProductDto())).collect(Collectors.toList());
     }
 
     public List<ProductDto> getAll(Integer page, Integer size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Product> products = productRepository.findAll(pageRequest);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> pages = productRepository.findAll(pageable);
         List<ProductDto> productList = new ArrayList<>();
-        for (Product product : products) {
-            if (product.getStatus().equals(ProductStatus.PUBLISHED)) {
+        for (Product product : pages) {
+            if (product.getStatus().equals(ProductStatus.CREATED)) {
                 productList.add(convertToDto(product, new ProductDto()));
             }
         }
@@ -149,7 +162,7 @@ public class ProductService {
         return "Product deleted !";
     }
 
-    public String getAllAdmin() {
+    public String getAllAdmin(Integer id) {
         if (profileService.isAdmin()) {
             return "Admin";
         }
@@ -177,4 +190,7 @@ public class ProductService {
         productRepository.save(product);
         return true;
     }
+
+
+
 }

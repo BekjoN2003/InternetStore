@@ -23,11 +23,9 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    private final ProductRepository productRepository;
 
-    public OrderService(OrderRepository orderRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
     }
 
     public Order getEntity(Integer id) {
@@ -38,19 +36,20 @@ public class OrderService {
         return optional.get();
     }
 
-    public OrderDto create(OrderCreateDto dto) {
-        Optional<Product> optional = productRepository.findById(dto.getProfileId());
-        if (optional.isEmpty()){
-            throw new BadRequest("Product not found");
-        }
+    public String create(Integer product_id, Integer profile_id, OrderCreateDto dto) {
         Order order = new Order();
-        order.setAddress(dto.getAddress());
-        order.setStatus(OrderStatus.CREATED);
+        if (product_id == null){
+            throw new BadRequest("Sorry This product is not available");
+        }
+        order.setProfileInt(profile_id);
+        order.setId(product_id);
         order.setCreatedAt(LocalDateTime.now());
+        order.setAddress(dto.getAddress());
+        order.setPaymentType(dto.getPaymentType());
         order.setContact(dto.getContact());
+        order.setStatus(OrderStatus.CREATED);
         orderRepository.save(order);
-        return convertToDto(order, new OrderDto());
-
+        return "Order created !";
     }
 
     public OrderDto get(Integer id) {
@@ -59,7 +58,6 @@ public class OrderService {
     public List<OrderDto> getAll(Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Order> orderPage = orderRepository.findAll(pageRequest);
-
         List<OrderDto> dtoList = new ArrayList<>();
         for (Order o : orderPage) {
             dtoList.add(convertToDto(o, new OrderDto()));
@@ -91,7 +89,6 @@ public class OrderService {
         dto.setAddress(order.getAddress());
         dto.setContact(order.getContact());
         dto.setRequirement(order.getRequirement());
-        dto.setProfileId(order.getProfileId());
         return dto;
     }
 

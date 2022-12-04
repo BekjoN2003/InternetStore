@@ -5,9 +5,11 @@ import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.dto.product.ProductFilterDto;
 import com.example.internet_magazin.dto.product.ProductListRepository;
 import com.example.internet_magazin.entity.Product;
+import com.example.internet_magazin.entity.ProductImage;
 import com.example.internet_magazin.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.validation.Valid;
@@ -35,7 +37,6 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
-
     @GetMapping("/filter")
     public ResponseEntity<?> getFilter(@RequestBody ProductFilterDto dto) {
         List<ProductDto> result = productService.filter(dto);
@@ -43,7 +44,7 @@ public class ProductController {
     }
 
     @PutMapping("/visible/{id}")
-    public ResponseEntity<?> visibleProduct(@PathVariable("id")Integer id, Product product){
+    public ResponseEntity<?> visibleProduct(@PathVariable("id")Integer id,@Valid Product product){
         return ResponseEntity.ok(productService.visible(id, product));
     }
     @PutMapping("/secured/block/{id}")
@@ -80,9 +81,9 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/secured/getAll")
-    public ResponseEntity<?>getById(){
-        String result = productService.getAllAdmin();
+    @GetMapping("/secured/getAll/{id}")
+    public ResponseEntity<?>getById(@PathVariable("id") Integer id){
+        String result = productService.getAllAdmin(id);
         return ResponseEntity.ok(result);
     }
 

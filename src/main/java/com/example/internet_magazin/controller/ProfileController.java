@@ -64,15 +64,16 @@ public class ProfileController {
 
 
     //================ USER ================//
-    @GetMapping("/verification/{token}")
+   @GetMapping("/verification/{token}")
     public ResponseEntity<?> verification(@PathVariable("token") String token){
         String result = profileService.verification(token);
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<?> updateProfile(@RequestBody @Valid ProfileDto dto){
-        ProfileDto result = profileService.update(SecurityUtil.getProfileId(), dto);
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateProfile(@RequestBody @Valid ProfileDto dto,
+                                           @PathVariable("id") Integer id){
+        ProfileDto result = profileService.update(dto , id);
         return ResponseEntity.ok(result);
     }
 

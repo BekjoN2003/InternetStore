@@ -14,9 +14,15 @@ public class ProductImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = ("product_id"), insertable = false, updatable = false)
+    @ManyToOne
+    @JoinColumn(name = ("product_id"), insertable = false, updatable = false)
+    private Product product;
+    @Column(name = ("product_id"))
     private Integer productId;
-    @Column(name = ("image_id"), insertable = false, updatable = false)
+    @ManyToOne
+    @JoinColumn(name = ("image_id"), insertable = false, updatable = false)
+    private Image image;
+    @Column(name = ("image_id"))
     private Integer imageId;
     @Column(name = ("create_at"))
     private LocalDateTime createdAt;

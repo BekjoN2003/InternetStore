@@ -1,9 +1,13 @@
 package com.example.internet_magazin.service;
 
 import com.example.internet_magazin.dto.image.ImageDto;
+import com.example.internet_magazin.dto.productImage.ProductImageDto;
 import com.example.internet_magazin.entity.Image;
+import com.example.internet_magazin.entity.Product;
+import com.example.internet_magazin.entity.ProductImage;
 import com.example.internet_magazin.exception.BadRequest;
 import com.example.internet_magazin.repository.ImageRepository;
+import com.example.internet_magazin.repository.ProductImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +27,7 @@ import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.io.File;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -59,7 +64,7 @@ public class ImageService {
         image.setSize(size);
         image.setToken(token);
         image.setType(type);
-        image.setUrl(serverAddress + "api/v1/image/get/" + token);
+        image.setUrl(serverAddress + token);
         image.setCreatedDate(LocalDateTime.now());
         imageRepository.save(image);
         ImageDto imageDto = new ImageDto();
@@ -67,13 +72,14 @@ public class ImageService {
         return imageDto;
     }
 
-    private void convertImageToDto(Image image, ImageDto imageDto) {
+    public ImageDto convertImageToDto(Image image, ImageDto imageDto) {
         imageDto.setSize(image.getSize());
         imageDto.setPath(image.getPath());
         imageDto.setUrl(image.getUrl());
         imageDto.setId(image.getId());
         imageDto.setToken(image.getToken());
         imageDto.setType(image.getType());
+        return imageDto;
     }
 
     public String getYMD() {
@@ -86,7 +92,8 @@ public class ImageService {
     public Resource load(String token) {
         try {
             Image entity = getImage(token);
-            Path file = Paths.get(fileUrl).resolve(entity.getPath() + "/" + entity.getToken() + "." + entity.getType());
+            Path file = Paths.get(fileUrl).resolve(entity.getPath() + "/" +
+                    entity.getToken() + "." + entity.getType());
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
@@ -101,6 +108,10 @@ public class ImageService {
 
     public Image getImage(String token) {
         return imageRepository.findByToken(token).orElseThrow(() -> new IllegalArgumentException("Image not found"));
+    }
+
+    public Image getImage(Integer id) {
+        return imageRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Image not found"));
     }
 
     public byte[] getImg(String token) {
@@ -148,5 +159,13 @@ public class ImageService {
         } catch (IOException e) {
             throw new BadRequest("File not created");
         }
+    }
+
+    public ImageDto getImageDto(Integer id) {
+        Image entity = getImage(id);
+        ImageDto dto = new ImageDto();
+        dto.setId(entity.getId());
+        dto.setUrl(serverAddress + entity.getToken());
+        return dto;
     }
 }

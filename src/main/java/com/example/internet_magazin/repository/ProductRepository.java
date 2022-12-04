@@ -13,7 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer>,
         JpaSpecificationExecutor<Product> {
 
 
-    @Query(value = "SELECT * FROM products where deleted_at is null and visible is not null", nativeQuery = true)
+    @Query(value = "SELECT * FROM products where deleted_at is null ", nativeQuery = true)
     Page<Product> findAll(Pageable pageable);
 
     @Query ("SELECT count(id) FROM products where deletedAt is null")

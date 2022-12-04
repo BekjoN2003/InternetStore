@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class OrderDto {
-    private Integer profileId;
     private String requirement;
     private String contact;
     private String address;

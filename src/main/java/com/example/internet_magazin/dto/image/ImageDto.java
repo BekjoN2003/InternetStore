@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collector;
 
 @Getter
 @Setter
@@ -17,5 +19,6 @@ public class ImageDto {
     private Long size;
     private String url;
     private String token;
+
 
 }

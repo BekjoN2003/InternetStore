@@ -38,9 +38,9 @@ public class OrderItemService {
     public OrderItemDto create(OrderItemCreateDto dto) {
         OrderItem orderItem = new OrderItem();
         orderItem.setCreatedAt(LocalDateTime.now());
+
         orderItem.setPrice(dto.getPrice());
         orderItem.setAmount(dto.getAmount());
-        orderItem.setOrderId(dto.getOrderId());
         orderItemRepository.save(orderItem);
         return convertToDto(orderItem, new OrderItemDto());
     }
@@ -65,7 +65,8 @@ public class OrderItemService {
     public List<OrderItemDto> getAll(Integer page, Integer size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<OrderItem> orderItems = orderItemRepository.findAll(pageRequest);
-        return orderItems.stream().map(orderItem -> convertToDto(orderItem, new OrderItemDto())).collect(Collectors.toList());
+        return orderItems.stream().map(orderItem -> convertToDto(orderItem,
+                new OrderItemDto())).collect(Collectors.toList());
     }
 
     public OrderItemDto convertToDto(OrderItem item, OrderItemDto dto) {

@@ -1,9 +1,10 @@
 package com.example.internet_magazin.util;
 
 import com.example.internet_magazin.config.CustomUserDetails;
-import com.example.internet_magazin.exception.BadRequest;
+
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +13,12 @@ import java.util.Date;
 @Component
 public class JwtTokenUtil {
 
-    Logger logger = null;
+    //Logger logger = null;
+    private final Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
     private final String jwtSecret = "zdtlD3JK56m6wTTgsNFhqzjqP";
     private final String issuer = "Internet Store";
 
-/*
+
     public String generateAccessToken(UserDetails userDetails){
         CustomUserDetails user = (CustomUserDetails) userDetails;
 
@@ -30,10 +32,9 @@ public class JwtTokenUtil {
 
         return jwtBuilder.compact();
     }
-*/
+
 
     public String generateAccessToken(Integer id, String email){
-
         JwtBuilder jwtBuilder = Jwts.builder();
         jwtBuilder.setId("some Id");
         jwtBuilder.setIssuedAt(new Date());
@@ -41,25 +42,22 @@ public class JwtTokenUtil {
         jwtBuilder.signWith(SignatureAlgorithm.HS256, jwtSecret);
         jwtBuilder.setExpiration(new Date(System.currentTimeMillis()+(24*60*60*1000)));
         jwtBuilder.setIssuer(issuer);
-
         return jwtBuilder.compact();
     }
 
-    public Integer getUserID(String token) {
-        try {
-            Claims claims = Jwts.parser().
-                    setSigningKey(jwtSecret).
-                    parseClaimsJws(token).
-                    getBody();
-            return Integer.valueOf(claims.getSubject().split(",")[0]);
-        } catch (RuntimeException e) {
-            throw new BadRequest("token expired");
-        }
+    public String getUserId(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
 
+        return claims.getSubject().split(",")[0];
     }
 
+
     public String getUserName(String token){
-        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().setSigningKey(jwtSecret).
+                parseClaimsJws(token).getBody();
         return claims.getSubject().split(",")[1];
     }
 
@@ -68,12 +66,12 @@ public class JwtTokenUtil {
         return claims.getExpiration();
     }
 
-    public boolean validate(String token) {
+    public Boolean validate(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
         } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature - {}", ex.getMessage());
+           logger.error("Invalid JWT signature - {}", ex.getMessage());
         } catch (MalformedJwtException ex) {
             logger.error("Invalid JWT token - {}", ex.getMessage());
         } catch (ExpiredJwtException ex) {

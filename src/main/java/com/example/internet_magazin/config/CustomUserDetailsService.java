@@ -25,10 +25,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("Keldi: loadUserByUsername");
         Optional<Profile> optional =this.profileRepository.findByEmailAndDeletedAtIsNull(username);
         optional.orElseThrow(() -> new UsernameNotFoundException("profile not found!"));
-
-        Profile profile =optional.get();
+        Profile profile = optional.get();
         System.out.println(profile);
-
         return new CustomUserDetails(profile);
     }
 }

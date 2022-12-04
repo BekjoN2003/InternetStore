@@ -4,10 +4,11 @@ import com.example.internet_magazin.type.ProfileStatus;
 import com.example.internet_magazin.type.Role;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Entity(name = "profiles")
@@ -16,11 +17,14 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = ("image_id"))
-    private Integer imageId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = ("image_id"))
+    private Image imageId;
     private String name;
     private String surname;
+    @Email
     private String email;
+    @UniqueElements( message = ("This contact already have"))
     private String contact;
     private String password;
     @Enumerated(EnumType.STRING)
@@ -31,9 +35,8 @@ public class Profile {
     private LocalDateTime deletedAt;
     @Column(name = ("updated_at"))
     private LocalDateTime updatedAt;
-    @Column(name = ("crated_at"))
+    @Column(name = ("created_at"))
     private LocalDateTime createdAt;
-
-
-
+    @Column(name = ("email_verified_at"))
+    private LocalDateTime emailVerifiedAt;
 }

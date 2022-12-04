@@ -2,7 +2,9 @@ package com.example.internet_magazin.controller;
 
 import com.example.internet_magazin.dto.order.OrderCreateDto;
 import com.example.internet_magazin.dto.order.OrderDto;
+import com.example.internet_magazin.entity.Product;
 import com.example.internet_magazin.service.OrderService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +22,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createOrder(@RequestBody @Valid OrderCreateDto dto) {
-        OrderDto result = orderService.create(dto);
+    @PostMapping
+    public ResponseEntity<?> createOrder(@RequestParam("product_id")Integer product_id,
+                                         @RequestParam("profile_id") Integer profile_id,
+                                         @RequestParam @Valid OrderCreateDto dto) {
+        String result = orderService.create(product_id, profile_id, dto);
         return ResponseEntity.ok(result);
     }
 

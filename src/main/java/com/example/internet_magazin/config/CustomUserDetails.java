@@ -21,6 +21,8 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private ProfileStatus status;
     private Role role;
+
+    private Boolean visible;
     private List<GrantedAuthority> authorityList;
 
     public CustomUserDetails(Profile profile){
@@ -29,7 +31,6 @@ public class CustomUserDetails implements UserDetails {
         this.password = profile.getPassword();
         this.status = profile.getStatus();
         this.role = profile.getRole();
-
         this.authorityList = List.of(new SimpleGrantedAuthority(role.toString()));
 
     }

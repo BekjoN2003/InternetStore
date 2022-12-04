@@ -2,6 +2,8 @@ package com.example.internet_magazin.controller;
 
 
 import com.example.internet_magazin.dto.image.ImageDto;
+import com.example.internet_magazin.dto.productImage.ProductImageDto;
+import com.example.internet_magazin.entity.Product;
 import com.example.internet_magazin.service.ImageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
@@ -22,12 +24,12 @@ import java.io.IOException;
 public class ImageController {
     private ImageService imageService;
 
+
     @PostMapping("/create")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file){
         ImageDto result = imageService.saveToSystem(file);
         return ResponseEntity.ok(result);
     }
-
     @GetMapping("/load/{filename:.+}")
     public @ResponseBody ResponseEntity<?> saveFile(@PathVariable String filename) throws IOException {
         Resource file = imageService.load(filename);
@@ -36,7 +38,7 @@ public class ImageController {
     }
 
     @GetMapping(value = "/get/{link:.+}", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody   byte[] getImage(@PathVariable("link") String link) {
+    public @ResponseBody byte[] getImage(@PathVariable("link") String link) {
         if (link != null && link.length() > 0) {
             try {
                 return imageService.getImg(link);
@@ -46,5 +48,13 @@ public class ImageController {
         }
         return null;
     }
+
+/*    @PostMapping("/{id}")
+    public ResponseEntity<ProductImageDto> saveImage (MultipartFile multipartFile,
+                                                      @PathVariable("id") Integer id,
+                                                      Product productId){
+        ProductImageDto result = imageService.saveImage(multipartFile, productId, id);
+        return ResponseEntity.ok(result);
+    }*/
 }
 

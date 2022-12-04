@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
 import java.util.Optional;
 
 @Service
@@ -38,7 +38,7 @@ public class AuthService {
         String token = jwtTokenUtil.generateAccessToken(profile.getId(), profile.getEmail());
         String link = verificationLinc + token;
         String subject = "Website Verification";
-        String content = "Click for verification this link: " + link + LocalDateTime.now();
+        String content = "Click for verification this link: " + link  ;//LocalDateTime.now();
         try {
             mailSenderService.send(profile.getEmail(), subject, content);
         } catch (Exception e) {
@@ -55,13 +55,15 @@ public class AuthService {
         if (optional.isPresent()) {
             throw new BadRequest("Profile whit this email already exist");
         }
-
         Profile profile = new Profile();
         profile.setName(dto.getName());
         profile.setEmail(dto.getEmail());
+        profile.setSurname(dto.getSurname());
+        profile.setContact(dto.getContact());
         profile.setPassword(passwordEncoder.encode(dto.getPassword()));
         profile.setCreatedAt(LocalDateTime.now());
         profile.setRole(Role.USER);
+        profile.setStatus(ProfileStatus.INACTIVE);
         profileRepository.save(profile);
         if (sendMessageToEmail(profile)) {
             return "Please confirm your email";
@@ -83,19 +85,41 @@ public class AuthService {
         return new LoginResultDto(profile.getEmail(), token);
     }
 
-    public String verification(String token) {
+ /*   public String verification(String token) {
         Profile profile = profileRepository.getById(jwtTokenUtil.getUserID(token));
-        if (profile == null) {
-            return "Profile not found"; 
+        if (!jwtTokenUtil.validate(token)) {
+            throw new BadRequest("Token invalid--");
         }
         if (profile.getStatus().equals(ProfileStatus.BLOCKED)) {
             return "Your profile is blocked";
         }
-        if (jwtTokenUtil.getExpirationDate(token).after(new Date(System.currentTimeMillis()))) {
+        if (jwtTokenUtil.getExpirationDate(token).after(LocalDateTime.now())) {
             profile.setStatus(ProfileStatus.ACTIVE);
             profileRepository.save(profile);
             return "Successful verified";
         }
         return "please return verified";
+    }*/
+
+    public String verification(String token) {
+        String email = jwtTokenUtil.getUserName(token);
+        if (!jwtTokenUtil.validate(token)) {
+            throw new BadRequest("Token invalid--");
+        }
+        Optional<Profile> optional = profileRepository.findByEmailAndDeletedAtIsNull(email);
+        if (optional.isEmpty()) {
+            throw new BadRequest("User not found");
+        }
+        Profile profile = optional.get();
+        if (profile.getEmailVerifiedAt() != null) {
+            throw new BadRequest("User already verified");
+        }
+        if (profile.getStatus().equals(ProfileStatus.BLOCKED)){
+            throw new BadRequest("Profile BLOCKED");
+        }
+        profile.setEmailVerifiedAt(LocalDateTime.now());
+        profile.setStatus(ProfileStatus.ACTIVE);
+        profileRepository.save(profile);
+        return "Successful verified";
     }
 }

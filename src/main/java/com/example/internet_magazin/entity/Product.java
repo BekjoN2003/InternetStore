@@ -28,7 +28,7 @@ public class Product {
     private LocalDateTime deletedAt;
     @Column(name = ("updated_at"))
     private LocalDateTime updatedAt;
-    @Column(name = ("crated_at"))
+    @Column(name = ("created_at"))
     private LocalDateTime createdAt;
 
 
