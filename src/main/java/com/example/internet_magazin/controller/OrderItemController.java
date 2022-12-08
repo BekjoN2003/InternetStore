@@ -2,7 +2,6 @@ package com.example.internet_magazin.controller;
 
 import com.example.internet_magazin.dto.orderItm.OrderItemCreateDto;
 import com.example.internet_magazin.dto.orderItm.OrderItemDto;
-import com.example.internet_magazin.dto.product.ProductDto;
 import com.example.internet_magazin.service.OrderItemService;
 
 import org.springframework.http.ResponseEntity;
@@ -22,8 +21,8 @@ public class OrderItemController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> createOrder(@RequestBody @Valid OrderItemCreateDto dto){
-        OrderItemDto result = orderItemService.create(dto);
+    public ResponseEntity<?> createOrder(@RequestParam("orderId")Integer order,@RequestBody @Valid OrderItemCreateDto dto){
+        OrderItemDto result = orderItemService.create(order,dto);
         return ResponseEntity.ok(result);
     }
 

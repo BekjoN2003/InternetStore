@@ -1,10 +1,10 @@
 package com.example.internet_magazin.dto.order;
 
-import com.example.internet_magazin.entity.Profile;
 import com.example.internet_magazin.type.PaymentType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.format.annotation.NumberFormat;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class OrderCreateDto {
     private Integer id;
     private String requirement;
-    @UniqueElements(message = "Please enter contact !")
+    @NumberFormat()
     private String contact;
     private String address;
     private LocalDateTime deliveryDate;

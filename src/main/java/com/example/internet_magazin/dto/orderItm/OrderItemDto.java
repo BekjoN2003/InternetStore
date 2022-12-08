@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
 @Setter
 
 public class OrderItemDto {
-
+    private Integer id;
+    private Integer orderId;
     private Integer amount;
     private Double price;
 

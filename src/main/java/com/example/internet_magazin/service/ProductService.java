@@ -8,6 +8,7 @@ import com.example.internet_magazin.exception.BadRequest;
 import com.example.internet_magazin.repository.ProductImageRepository;
 import com.example.internet_magazin.repository.ProductRepository;
 import com.example.internet_magazin.type.ProductStatus;
+import com.example.internet_magazin.type.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,16 +31,12 @@ public class ProductService {
 
     private final ProductImageService productImageService;
 
-    private final ImageService imageService;
-
-    private final ProductImageRepository productImageRepository;
 
     public ProductService(ProductRepository productRepository, ProfileService profileService, ProductImageService productImageService, ImageService imageService, ProductImageRepository productImageRepository) {
         this.productRepository = productRepository;
         this.profileService = profileService;
         this.productImageService = productImageService;
-        this.imageService = imageService;
-        this.productImageRepository = productImageRepository;
+
     }
 
     public Product getEntity(Integer id) {
@@ -54,16 +51,16 @@ public class ProductService {
     }
 
     public ProductDto create(ProductCreateDto dto) {
-        Product product = new Product();
-        product.setCreatedAt(LocalDateTime.now());
-        product.setVisible(true);
-        product.setName(dto.getName());
-        product.setDescription(dto.getDescription());
-        product.setPrice(dto.getPrice());
-        product.setStatus(ProductStatus.PUBLISHED);
-        product.setVisible(dto.getVisible());
-        productRepository.save(product);
-        return convertToDto(product, new ProductDto());
+            Product product = new Product();
+            product.setCreatedAt(LocalDateTime.now());
+            product.setVisible(true);
+            product.setName(dto.getName());
+            product.setDescription(dto.getDescription());
+            product.setPrice(dto.getPrice());
+            product.setStatus(ProductStatus.PUBLISHED);
+            product.setVisible(dto.getVisible());
+            productRepository.save(product);
+            return convertToDto(product, new ProductDto());
     }
 
     public ProductDto get(Integer id) {

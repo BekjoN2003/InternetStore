@@ -31,15 +31,16 @@ public class OrderItemService {
         return optional.get();
     }
 
-    public OrderItemDto get (Integer id){
-        return convertToDto(getEntity(id),new OrderItemDto());
+    public OrderItemDto get(Integer id) {
+        return convertToDto(getEntity(id), new OrderItemDto());
     }
 
-    public OrderItemDto create(OrderItemCreateDto dto) {
+    public OrderItemDto create(Integer orderId, OrderItemCreateDto dto) {
         OrderItem orderItem = new OrderItem();
+        orderItem.setOrderId(orderId);
         orderItem.setCreatedAt(LocalDateTime.now());
-
-        orderItem.setPrice(dto.getPrice());
+        orderItem.setProduct(dto.getProductId());
+        orderItem.setPrice(dto.getProductDto().getPrice());
         orderItem.setAmount(dto.getAmount());
         orderItemRepository.save(orderItem);
         return convertToDto(orderItem, new OrderItemDto());
@@ -48,7 +49,7 @@ public class OrderItemService {
     public OrderItemDto update(Integer id, OrderItemCreateDto dto) {
         OrderItem orderItem = getEntity(id);
         orderItem.setUpdatedAt(LocalDateTime.now());
-        orderItem.setPrice(dto.getPrice());
+        orderItem.setPrice(dto.getProductDto().getPrice());
         orderItem.setAmount(dto.getAmount());
         orderItemRepository.save(orderItem);
         return convertToDto(orderItem, new OrderItemDto());
@@ -57,7 +58,7 @@ public class OrderItemService {
     public boolean delete(Integer id) {
         OrderItem orderItem = getEntity(id);
         orderItem.setDeletedAt(LocalDateTime.now());
-        orderItemRepository.delete(orderItem);
+        orderItemRepository.save(orderItem);
         return true;
     }
 
@@ -70,6 +71,8 @@ public class OrderItemService {
     }
 
     public OrderItemDto convertToDto(OrderItem item, OrderItemDto dto) {
+        dto.setId(item.getId());
+        dto.setOrderId(item.getOrderId());
         dto.setAmount(item.getAmount());
         dto.setPrice(item.getPrice());
         return dto;
