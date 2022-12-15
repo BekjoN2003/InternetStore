@@ -17,10 +17,10 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer profileInt;
+    private Integer profileId;
     @ManyToOne
     @JoinColumn(name = ("profile_id"), insertable = false, updatable = false)
-    private Profile profileId;
+    private Profile profile;
     private String requirement;
     private String contact;
     private String address;

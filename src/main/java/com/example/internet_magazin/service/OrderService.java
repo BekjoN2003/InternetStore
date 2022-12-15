@@ -36,7 +36,7 @@ public class OrderService {
 
     public String create(Integer profile_id, OrderCreateDto dto) {
         Order order = new Order();
-        order.setProfileInt(profile_id);
+        order.setProfileId(profile_id);
         order.setRequirement(dto.getRequirement());
         order.setCreatedAt(LocalDateTime.now());
         order.setPaymentType(dto.getPaymentType());

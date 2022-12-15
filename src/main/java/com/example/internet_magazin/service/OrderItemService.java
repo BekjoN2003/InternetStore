@@ -39,7 +39,7 @@ public class OrderItemService {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrderId(orderId);
         orderItem.setCreatedAt(LocalDateTime.now());
-        orderItem.setProduct(dto.getProductId());
+        orderItem.setProductId(dto.getProductId());
         orderItem.setPrice(dto.getProductDto().getPrice());
         orderItem.setAmount(dto.getAmount());
         orderItemRepository.save(orderItem);
